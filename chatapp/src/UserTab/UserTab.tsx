@@ -51,14 +51,18 @@ const UserTab = ({ isOpen, setIsOpen }: UserTabProps) => {
           </Typography>
           <Typography
             variant='caption'
+            color='textSecondary'
             sx={{
               cursor: 'pointer',
               textAlign: 'center',
-              color: '#e7e7e7',
               textDecoration: 'underline',
             }}
             onClick={() => {
-              setShowLoginForm(true);
+              if (isSignedIn) {
+                console.log('not signed in');
+              } else {
+                setShowLoginForm(true);
+              }
             }}
           >
             {isSignedIn ? 'logout' : 'login'}
@@ -83,7 +87,7 @@ const UserTab = ({ isOpen, setIsOpen }: UserTabProps) => {
           position: 'relative',
         }}
       >
-        {showLoginForm && <LoginForm />}
+        {showLoginForm && <LoginForm setOpen={setShowLoginForm} />}
         users panel
       </Box>
     </TabContainer>

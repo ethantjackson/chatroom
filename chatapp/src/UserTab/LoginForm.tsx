@@ -1,8 +1,8 @@
-import { Box, styled } from '@mui/material';
+import { Box, Typography, styled } from '@mui/material';
 import PersonIcon from '@mui/icons-material/Person';
 import KeyIcon from '@mui/icons-material/Key';
 import LoginIcon from '@mui/icons-material/Login';
-import React from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 
 const IconBox = styled(Box)(({ theme }) => ({
   height: '32px',
@@ -21,6 +21,7 @@ const LoginInput = styled('input')({
   height: '32px',
   boxSizing: 'border-box',
   marginLeft: '32px',
+  marginBottom: '8px',
   '&:focus': {
     outline: 'none',
   },
@@ -40,9 +41,31 @@ const SubmitBtn = styled(Box)(({ theme }) => ({
   cursor: 'pointer',
 }));
 
-const LoginForm = () => {
+interface LoginFormProps {
+  setOpen: (val: boolean) => void;
+}
+
+const LoginForm = ({ setOpen }: LoginFormProps) => {
+  const [isCreateAccount, setIsCreateAccount] = useState(false);
+  const formRef = useRef<Node>(null);
+
+  useEffect(() => {
+    const detectClickOut = (event: MouseEvent) => {
+      if (formRef.current && !formRef.current.contains(event.target as Node)) {
+        setOpen(false);
+      }
+    };
+
+    document.addEventListener('mousedown', detectClickOut);
+
+    return () => {
+      document.removeEventListener('mousedown', detectClickOut);
+    };
+  }, []);
+
   return (
     <Box
+      ref={formRef}
       sx={{
         width: 'calc(100% - 24px)',
         boxSizing: 'border-box',
@@ -53,21 +76,62 @@ const LoginForm = () => {
         padding: '8px',
       }}
     >
-      <IconBox>
-        <PersonIcon />
-      </IconBox>
-      <LoginInput placeholder='Username' sx={{ marginBottom: '8px' }} />
-      <IconBox>
-        <KeyIcon />
-      </IconBox>
-      <SubmitBtn>
-        <LoginIcon />
-      </SubmitBtn>
-      <LoginInput
-        type='password'
-        placeholder='Password'
-        sx={{ width: 'calc(100% - 32px - 32px)' }}
-      />
+      {isCreateAccount ? (
+        <>
+          <IconBox>
+            <PersonIcon />
+          </IconBox>
+          <LoginInput placeholder='Username' />
+          <IconBox>
+            <KeyIcon />
+          </IconBox>
+          <LoginInput type='password' placeholder='Password' />
+          <SubmitBtn>
+            <LoginIcon />
+          </SubmitBtn>
+          <IconBox>
+            <KeyIcon />
+          </IconBox>
+          <LoginInput
+            type='password'
+            placeholder='Confirm Passord'
+            sx={{ width: 'calc(100% - 32px - 32px)' }}
+          />
+        </>
+      ) : (
+        <>
+          <IconBox>
+            <PersonIcon />
+          </IconBox>
+          <LoginInput placeholder='Username' />
+          <IconBox>
+            <KeyIcon />
+          </IconBox>
+          <SubmitBtn>
+            <LoginIcon />
+          </SubmitBtn>
+          <LoginInput
+            type='password'
+            placeholder='Password'
+            sx={{ width: 'calc(100% - 32px - 32px)' }}
+          />
+        </>
+      )}
+      <Box sx={{ width: '100%', textAlign: 'center' }} mt={-0.5}>
+        <Typography
+          variant='caption'
+          color='textSecondary'
+          sx={{
+            textDecoration: 'underline',
+            cursor: 'pointer',
+          }}
+          onClick={() => {
+            setIsCreateAccount(!isCreateAccount);
+          }}
+        >
+          {isCreateAccount ? 'Use an existing account' : 'Create an account'}
+        </Typography>
+      </Box>
     </Box>
   );
 };

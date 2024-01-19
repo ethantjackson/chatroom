@@ -3,6 +3,7 @@ import UserTab from '../UserTab/UserTab';
 import { Box, Grid, styled } from '@mui/material';
 import PersonIcon from '@mui/icons-material/Person';
 import SendIcon from '@mui/icons-material/Send';
+import MessagesArea from '../MessagesArea/MessagesArea';
 
 const UserTabBtn = styled(Box)(({ theme }) => ({
   height: '100%',
@@ -17,7 +18,7 @@ const UserTabBtn = styled(Box)(({ theme }) => ({
 
 const MessageInput = styled('input')({
   position: 'relative',
-  top: '-8px',
+  top: '-7px',
   paddingBlock: '0',
   paddingInline: '0',
   paddingLeft: '24px',
@@ -67,7 +68,7 @@ const ChatRoom = () => {
             boxShadow: 'inset -2px 2px 11px rgba(0, 0, 0, 0.1)',
           }}
         >
-          messages area
+          <MessagesArea />
         </Box>
         <MessageInput placeholder='Type your message here...' />
         <Box

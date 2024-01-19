@@ -24,9 +24,8 @@ export const themeOptions: ThemeOptions = {
       main: '#ff4d8e',
     },
     text: {
-      primary: '#303030',
-      secondary: '#00CACB',
-      disabled: '#7e7e7e',
+      primary: '#6e6e6e',
+      secondary: '#e7e7e7',
     },
     background: {
       default: '#DAE3EC',
