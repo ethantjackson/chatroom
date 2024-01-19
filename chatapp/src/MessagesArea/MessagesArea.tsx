@@ -1,4 +1,6 @@
 import { Box, Typography, styled } from '@mui/material';
+import UpIcon from '@mui/icons-material/KeyboardArrowUp';
+import DownIcon from '@mui/icons-material/KeyboardArrowDown';
 import React from 'react';
 
 const mockMessages = [
@@ -30,15 +32,14 @@ const mockMessages = [
 
 const mockUsername = 'chetbaker';
 
-const MessageBubble = styled(Box)(({ theme }) => ({
+const MessageBubble = styled(Box)({
   textAlign: 'left',
-  color: 'textPrimary',
   display: 'inline-block',
   maxWidth: '60%',
   borderRadius: '24px',
   padding: '12px 22px',
   boxShadow: '0px 0px 5px rgba(0,0,0,0.1)',
-}));
+});
 
 const MessagesArea = () => {
   return (
@@ -46,10 +47,29 @@ const MessagesArea = () => {
       {mockMessages.map(({ username, message }, index) => (
         <Box
           key={username + index}
-          sx={{ textAlign: username === mockUsername ? 'right' : 'left' }}
+          sx={{
+            display: 'flex',
+            justifyContent: username === mockUsername ? 'right' : 'left',
+            alignItems: 'stretch',
+            color: (theme) => theme.palette.text.primary,
+          }}
+          mb={3}
         >
+          <Box
+            sx={{
+              display: 'inline-flex',
+              flexDirection: 'column',
+              justifyContent: 'center',
+              order: username === mockUsername ? '0' : '1',
+              textAlign: 'center',
+            }}
+            p={1}
+          >
+            <UpIcon sx={{ cursor: 'pointer' }} />
+            <Typography variant='body2'>10</Typography>
+            <DownIcon sx={{ cursor: 'pointer' }} />
+          </Box>
           <MessageBubble
-            mb={3}
             sx={{
               backgroundColor: (theme) =>
                 username === mockUsername
@@ -59,12 +79,12 @@ const MessagesArea = () => {
           >
             <Typography
               variant='body2'
-              color={username === mockUsername ? 'primary' : 'secondary'}
+              color={username === mockUsername ? 'secondary' : 'primary'}
               sx={{ fontWeight: 'bold' }}
             >
               {username}
             </Typography>
-            <Typography color='textPrimary'>{message}</Typography>
+            <Typography>{message}</Typography>
           </MessageBubble>
         </Box>
       ))}
