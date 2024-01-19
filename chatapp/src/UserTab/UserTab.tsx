@@ -1,6 +1,7 @@
 import { Box, Grid, Typography, styled } from '@mui/material';
 import PersonIcon from '@mui/icons-material/Person';
 import React, { useState } from 'react';
+import LoginForm from './LoginForm';
 
 const TabContainer = styled(Box)(({ theme }) => ({
   backgroundColor: theme.palette.background.paper,
@@ -9,10 +10,11 @@ const TabContainer = styled(Box)(({ theme }) => ({
 
 const PrimaryGridItem = styled(Grid)({
   display: 'flex',
-  flexDirection: 'column',
-  justifyContnt: 'center',
+  flexWrap: 'wrap',
+  justifyContent: 'center',
+  alignItems: 'center',
   height: '100%',
-  cursor: 'pointer',
+  padding: '12px 0',
 });
 
 interface UserTabProps {
@@ -21,23 +23,15 @@ interface UserTabProps {
 }
 
 const UserTab = ({ isOpen, setIsOpen }: UserTabProps) => {
-  if (!isOpen)
-    return (
-      <PrimaryGridItem
-        sx={{
-          backgroundColor: (theme) => theme.palette.primary.light,
-          color: (theme) => theme.palette.primary.contrastText,
-          height: '82px',
-        }}
-        onClick={() => {
-          setIsOpen(true);
-        }}
-      >
-        <PersonIcon sx={{ margin: 'auto' }} />
-      </PrimaryGridItem>
-    );
+  const [isSignedIn, setIsSignedIn] = useState(false);
+  const [showLoginForm, setShowLoginForm] = useState(false);
+
   return (
-    <TabContainer sx={{ display: isOpen ? 'block' : 'none' }}>
+    <TabContainer
+      sx={{
+        backgroundColor: (theme) => theme.palette.primary.light,
+      }}
+    >
       <Grid
         container
         sx={{
@@ -49,16 +43,33 @@ const UserTab = ({ isOpen, setIsOpen }: UserTabProps) => {
           item
           xs={9}
           sx={{
-            backgroundColor: (theme) => theme.palette.primary.main,
+            backgroundColor: (theme) => theme.palette.primary.dark,
           }}
         >
-          <Typography sx={{ margin: 'auto' }}>User Name</Typography>
+          <Typography sx={{ flexGrow: 1, textAlign: 'center', width: '100%' }}>
+            {isSignedIn ? 'Hi, Ethan Jackson' : 'Hello!'}
+          </Typography>
+          <Typography
+            variant='caption'
+            sx={{
+              cursor: 'pointer',
+              textAlign: 'center',
+              color: '#e7e7e7',
+              textDecoration: 'underline',
+            }}
+            onClick={() => {
+              setShowLoginForm(true);
+            }}
+          >
+            {isSignedIn ? 'logout' : 'login'}
+          </Typography>
         </PrimaryGridItem>
         <PrimaryGridItem
           item
           xs={3}
           sx={{
-            backgroundColor: (theme) => theme.palette.primary.light,
+            backgroundColor: (theme) => theme.palette.primary.main,
+            cursor: 'pointer',
           }}
           onClick={() => {
             setIsOpen(false);
@@ -67,6 +78,14 @@ const UserTab = ({ isOpen, setIsOpen }: UserTabProps) => {
           <PersonIcon sx={{ margin: 'auto' }} />
         </PrimaryGridItem>
       </Grid>
+      <Box
+        sx={{
+          position: 'relative',
+        }}
+      >
+        {showLoginForm && <LoginForm />}
+        users panel
+      </Box>
     </TabContainer>
   );
 };

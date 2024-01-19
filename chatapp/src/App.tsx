@@ -9,9 +9,9 @@ export const themeOptions: ThemeOptions = {
   palette: {
     mode: 'light',
     primary: {
-      main: '#7B7EAE',
-      light: '#868BBB',
-      dark: '#576B90',
+      main: '#868BBB',
+      dark: '#7B7EAE',
+      light: '#EAF0F4',
       contrastText: '#fff',
     },
     secondary: {
@@ -29,7 +29,7 @@ export const themeOptions: ThemeOptions = {
       disabled: '#7e7e7e',
     },
     background: {
-      default: '#EEF3F7',
+      default: '#DAE3EC',
       paper: '#fff',
     },
   },
@@ -41,7 +41,7 @@ function App() {
     <ThemeProvider theme={theme}>
       <Router>
         <Routes>
-          <Route path='' element={<ChatRoom />} />
+          <Route path='/' element={<ChatRoom />} />
         </Routes>
       </Router>
     </ThemeProvider>
