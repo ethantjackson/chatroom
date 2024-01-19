@@ -1,5 +1,5 @@
 import express from 'express';
-import mongoose, { ConnectOptions } from 'mongoose';
+import mongoose, { ConnectOptions, Document } from 'mongoose';
 import dotenv from 'dotenv';
 import path from 'path';
 import { fileURLToPath } from 'url';
@@ -58,14 +58,14 @@ app.post('/register', (req, res) => {
             },
           });
         })
-        .catch((err) => {
+        .catch((err: Error) => {
           console.log(err);
           res.status(500).json({
             message: { msgBody: 'Error saving user', msgError: true },
           });
         });
     })
-    .catch((err) => {
+    .catch((err: Error) => {
       console.log(err);
       res.status(500).json({
         message: { msgBody: 'Could not register user', msgError: true },
