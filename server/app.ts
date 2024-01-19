@@ -1,7 +1,6 @@
 import express from 'express';
 import mongoose, { ConnectOptions } from 'mongoose';
 import dotenv from 'dotenv';
-import { LocalStorage } from 'node-localstorage';
 import path from 'path';
 import { fileURLToPath } from 'url';
 import User from './schemas/UserSchema.ts';
@@ -10,7 +9,6 @@ const app = express();
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 const dotenvConfig = dotenv.config({ path: `${__dirname}/.env` });
-const localStorage = new LocalStorage('./scratch');
 
 app.use(express.json());
 
