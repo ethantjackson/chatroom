@@ -27,7 +27,7 @@ const MessagesArea = () => {
             display: 'flex',
             justifyContent:
               sender.username === user?.username ? 'right' : 'left',
-            alignItems: 'stretch',
+            alignItems: 'center',
             color: (theme) => theme.palette.text.primary,
           }}
           mb={3}

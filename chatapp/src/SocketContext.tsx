@@ -11,7 +11,7 @@ import Cookies from 'js-cookie';
 export interface IMessage {
   content: string;
   sender: IUser;
-  timestamp?: string;
+  _id?: string;
 }
 
 interface SocketContextProps {
@@ -43,7 +43,6 @@ export const SocketProvider = ({ children }: SocketContextProps) => {
     if (message.content.trim() === '' || !socket) {
       return;
     }
-    socket.send(JSON.stringify(message));
     const res = await fetch('/message/create-chat-message', {
       method: 'POST',
       headers: {
@@ -58,7 +57,10 @@ export const SocketProvider = ({ children }: SocketContextProps) => {
     if (!res.ok) {
       const { message } = await res.json();
       console.log(message);
+      return;
     }
+    const { _id } = await res.json();
+    socket.send(JSON.stringify({ ...message, _id }));
   };
 
   useEffect(() => {
@@ -72,7 +74,6 @@ export const SocketProvider = ({ children }: SocketContextProps) => {
       setMessages(
         data.messages.map((message: IChatDBRes) => {
           const { content, sender, senderUsername } = message;
-          console.log(content, sender, senderUsername);
           return {
             content,
             sender: {
