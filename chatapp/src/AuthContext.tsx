@@ -11,7 +11,7 @@ interface AuthProviderProps {
   children: ReactNode;
 }
 
-interface IUser {
+export interface IUser {
   username: string;
 }
 
@@ -35,7 +35,7 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
     password: string
   ): Promise<ILoginRes> => {
     try {
-      const res = await fetch('/login', {
+      const res = await fetch('/user/login', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -67,7 +67,7 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
   useEffect(() => {
     const jwtCookie = Cookies.get('jwtCookie');
     if (jwtCookie) {
-      fetch('/get-authenticated-user', {
+      fetch('/user/get-authenticated-user', {
         headers: {
           Authorization: jwtCookie,
         },

@@ -3,6 +3,7 @@ import PersonIcon from '@mui/icons-material/Person';
 import React, { useState } from 'react';
 import LoginForm from './LoginForm';
 import { useAuth } from '../AuthContext';
+import UsersList from './UsersList';
 
 const TabContainer = styled(Box)(({ theme }) => ({
   backgroundColor: theme.palette.background.paper,
@@ -89,7 +90,7 @@ const UserTab = ({ isOpen, setIsOpen }: UserTabProps) => {
         }}
       >
         {showLoginForm && <LoginForm setOpen={setShowLoginForm} />}
-        users panel
+        <UsersList />
       </Box>
     </TabContainer>
   );

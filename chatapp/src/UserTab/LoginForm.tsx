@@ -5,6 +5,17 @@ import LoginIcon from '@mui/icons-material/Login';
 import React, { useEffect, useRef, useState, KeyboardEvent } from 'react';
 import { useAuth } from '../AuthContext';
 
+const FormContainer = styled(Box)(({ theme }) => ({
+  width: 'calc(100% - 24px)',
+  boxSizing: 'border-box',
+  position: 'absolute',
+  top: '12px',
+  left: '12px',
+  backgroundColor: theme.palette.primary.dark,
+  padding: '8px',
+  zIndex: '1',
+}));
+
 const IconBox = styled(Box)(({ theme }) => ({
   height: '32px',
   width: '32px',
@@ -102,7 +113,7 @@ const LoginForm = ({ setOpen }: LoginFormProps) => {
       return;
     }
     try {
-      const res = await fetch('/register', {
+      const res = await fetch('/user/register', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -124,18 +135,7 @@ const LoginForm = ({ setOpen }: LoginFormProps) => {
   };
 
   return (
-    <Box
-      ref={formRef}
-      sx={{
-        width: 'calc(100% - 24px)',
-        boxSizing: 'border-box',
-        position: 'absolute',
-        top: '12px',
-        left: '12px',
-        backgroundColor: (theme) => theme.palette.primary.dark,
-        padding: '8px',
-      }}
-    >
+    <FormContainer ref={formRef}>
       {isCreateAccount ? (
         <>
           <IconBox>
@@ -224,7 +224,7 @@ const LoginForm = ({ setOpen }: LoginFormProps) => {
           {isCreateAccount ? 'Use an existing account' : 'Create an account'}
         </Typography>
       </Box>
-    </Box>
+    </FormContainer>
   );
 };
 
