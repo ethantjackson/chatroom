@@ -29,7 +29,9 @@ const MessageInput = () => {
     }
     sendMessage({
       content: content,
-      sender: user,
+      senderId: user._id,
+      senderUsername: user.username,
+      votes: 0,
     });
     setContent('');
   };

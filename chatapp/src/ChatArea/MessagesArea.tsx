@@ -20,13 +20,12 @@ const MessagesArea = () => {
 
   return (
     <Box p={2} sx={{ height: '100%', overflow: 'auto' }}>
-      {messages.map(({ sender, content }, index) => (
+      {messages.map(({ senderId, senderUsername, content, votes }, index) => (
         <Box
-          key={sender.username + index}
+          key={senderId + index}
           sx={{
             display: 'flex',
-            justifyContent:
-              sender.username === user?.username ? 'right' : 'left',
+            justifyContent: senderId === user?._id ? 'right' : 'left',
             alignItems: 'center',
             color: (theme) => theme.palette.text.primary,
           }}
@@ -37,31 +36,29 @@ const MessagesArea = () => {
               display: 'inline-flex',
               flexDirection: 'column',
               justifyContent: 'center',
-              order: sender.username === user?.username ? '0' : '1',
+              order: senderId === user?._id ? '0' : '1',
               textAlign: 'center',
             }}
             p={1}
           >
             <UpIcon sx={{ cursor: 'pointer' }} />
-            <Typography variant='body2'>10</Typography>
+            <Typography variant='body2'>{JSON.stringify(votes)}</Typography>
             <DownIcon sx={{ cursor: 'pointer' }} />
           </Box>
           <MessageBubble
             sx={{
               backgroundColor: (theme) =>
-                sender.username === user?.username
+                senderId === user?._id
                   ? theme.palette.primary.light
                   : theme.palette.background.paper,
             }}
           >
             <Typography
               variant='body2'
-              color={
-                sender.username === user?.username ? 'secondary' : 'primary'
-              }
+              color={senderId === user?._id ? 'secondary' : 'primary'}
               sx={{ fontWeight: 'bold' }}
             >
-              {sender.username}
+              {senderUsername}
             </Typography>
             <Typography>{content}</Typography>
           </MessageBubble>

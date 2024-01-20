@@ -5,23 +5,18 @@ import React, {
   useEffect,
   useState,
 } from 'react';
-import { IUser } from './AuthContext';
 import Cookies from 'js-cookie';
 
 export interface IMessage {
   content: string;
-  sender: IUser;
+  senderId: string;
+  senderUsername: string;
+  votes: Number;
   _id?: string;
 }
 
 interface SocketContextProps {
   children: ReactNode;
-}
-
-interface IChatDBRes {
-  content: string;
-  sender: string;
-  senderUsername: string;
 }
 
 const SocketContext = createContext({
@@ -51,7 +46,7 @@ export const SocketProvider = ({ children }: SocketContextProps) => {
       },
       body: JSON.stringify({
         content: message.content,
-        senderUsername: message.sender.username,
+        senderUsername: message.senderUsername,
       }),
     });
     if (!res.ok) {
@@ -71,18 +66,7 @@ export const SocketProvider = ({ children }: SocketContextProps) => {
         console.log(data.message);
         return;
       }
-      setMessages(
-        data.messages.map((message: IChatDBRes) => {
-          const { content, sender, senderUsername } = message;
-          return {
-            content,
-            sender: {
-              _id: sender,
-              username: senderUsername,
-            },
-          };
-        })
-      );
+      setMessages([...data.messages]);
     });
   }, []);
 
