@@ -1,9 +1,13 @@
 import { Schema, Document, model } from 'mongoose';
 import { compare, hash } from 'bcrypt';
 
-interface IUser extends Document {
+export interface IUser extends Document {
   username: string;
   password: string;
+  comparePasswords: (
+    pass: string,
+    next: (err: Error | null, same: boolean | null) => void
+  ) => void;
 }
 
 const UserSchema = new Schema<IUser>({
@@ -23,13 +27,10 @@ const UserSchema = new Schema<IUser>({
 UserSchema.pre(
   'save',
   function (this: IUser, next: (err?: Error | undefined) => void) {
-    console.log('attempting save');
-    // * Make sure you don't hash the hash
     if (!this.isModified('password')) {
       return next();
     }
     hash(this.password, 10, (err, hash) => {
-      console.log('created hash', hash, err);
       if (err) return next(err);
       this.password = hash;
       next();

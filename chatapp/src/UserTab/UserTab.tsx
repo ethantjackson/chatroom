@@ -2,6 +2,7 @@ import { Box, Grid, Typography, styled } from '@mui/material';
 import PersonIcon from '@mui/icons-material/Person';
 import React, { useState } from 'react';
 import LoginForm from './LoginForm';
+import { useAuth } from '../AuthContext';
 
 const TabContainer = styled(Box)(({ theme }) => ({
   backgroundColor: theme.palette.background.paper,
@@ -23,7 +24,7 @@ interface UserTabProps {
 }
 
 const UserTab = ({ isOpen, setIsOpen }: UserTabProps) => {
-  const [isSignedIn, setIsSignedIn] = useState(false);
+  const { user, logout } = useAuth();
   const [showLoginForm, setShowLoginForm] = useState(false);
 
   return (
@@ -47,7 +48,7 @@ const UserTab = ({ isOpen, setIsOpen }: UserTabProps) => {
           }}
         >
           <Typography sx={{ flexGrow: 1, textAlign: 'center', width: '100%' }}>
-            {isSignedIn ? 'Hi, Ethan Jackson' : 'Hello!'}
+            {user ? `Hi, ${user.username}` : 'Hello!'}
           </Typography>
           <Typography
             variant='caption'
@@ -58,14 +59,14 @@ const UserTab = ({ isOpen, setIsOpen }: UserTabProps) => {
               textDecoration: 'underline',
             }}
             onClick={() => {
-              if (isSignedIn) {
-                console.log('not signed in');
+              if (user) {
+                logout();
               } else {
                 setShowLoginForm(true);
               }
             }}
           >
-            {isSignedIn ? 'logout' : 'login'}
+            {user ? 'logout' : 'login'}
           </Typography>
         </PrimaryGridItem>
         <PrimaryGridItem

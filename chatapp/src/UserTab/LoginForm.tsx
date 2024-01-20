@@ -2,7 +2,8 @@ import { Box, Typography, styled } from '@mui/material';
 import PersonIcon from '@mui/icons-material/Person';
 import KeyIcon from '@mui/icons-material/Key';
 import LoginIcon from '@mui/icons-material/Login';
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useRef, useState, KeyboardEvent } from 'react';
+import { useAuth } from '../AuthContext';
 
 const IconBox = styled(Box)(({ theme }) => ({
   height: '32px',
@@ -47,7 +48,15 @@ interface LoginFormProps {
 
 const LoginForm = ({ setOpen }: LoginFormProps) => {
   const [isCreateAccount, setIsCreateAccount] = useState(false);
+  const [formVals, setFormVals] = useState({
+    regUsername: '',
+    regPassword: '',
+    regConfirmPassword: '',
+    loginUsername: '',
+    loginPassword: '',
+  });
   const formRef = useRef<Node>(null);
+  const { login } = useAuth();
 
   useEffect(() => {
     const detectClickOut = (event: MouseEvent) => {
@@ -55,13 +64,64 @@ const LoginForm = ({ setOpen }: LoginFormProps) => {
         setOpen(false);
       }
     };
-
     document.addEventListener('mousedown', detectClickOut);
-
     return () => {
       document.removeEventListener('mousedown', detectClickOut);
     };
-  }, []);
+  }, [setOpen]);
+
+  const handleChange = (field: string, newVal: string) => {
+    setFormVals({
+      ...formVals,
+      [field]: newVal,
+    });
+  };
+
+  const detectEnter = (event: KeyboardEvent<HTMLInputElement>) => {
+    if (event.key === 'Enter') {
+      handleSubmit();
+    }
+  };
+
+  const handleSubmit = async () => {
+    if (!isCreateAccount) {
+      const { success, message } = await login(
+        formVals.loginUsername,
+        formVals.loginPassword
+      );
+      if (!success) {
+        console.log(message || 'Login failed');
+      } else {
+        setOpen(false);
+      }
+      return;
+    }
+
+    if (formVals.regPassword !== formVals.regConfirmPassword) {
+      console.log('mismatched passwords');
+      return;
+    }
+    try {
+      const res = await fetch('/register', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          username: formVals.regUsername,
+          password: formVals.regPassword,
+        }),
+      });
+      if (!res.ok) {
+        console.log('Could not register');
+        return;
+      }
+      console.log('Account created successfully');
+      setIsCreateAccount(false);
+    } catch (error) {
+      console.log(error);
+    }
+  };
 
   return (
     <Box
@@ -81,12 +141,27 @@ const LoginForm = ({ setOpen }: LoginFormProps) => {
           <IconBox>
             <PersonIcon />
           </IconBox>
-          <LoginInput placeholder='Username' />
+          <LoginInput
+            placeholder='Username'
+            value={formVals.regUsername}
+            onChange={(e) => {
+              handleChange('regUsername', e.target.value);
+            }}
+            onKeyDown={detectEnter}
+          />
           <IconBox>
             <KeyIcon />
           </IconBox>
-          <LoginInput type='password' placeholder='Password' />
-          <SubmitBtn>
+          <LoginInput
+            type='password'
+            placeholder='Password'
+            value={formVals.regPassword}
+            onChange={(e) => {
+              handleChange('regPassword', e.target.value);
+            }}
+            onKeyDown={detectEnter}
+          />
+          <SubmitBtn onClick={handleSubmit}>
             <LoginIcon />
           </SubmitBtn>
           <IconBox>
@@ -95,6 +170,11 @@ const LoginForm = ({ setOpen }: LoginFormProps) => {
           <LoginInput
             type='password'
             placeholder='Confirm Passord'
+            value={formVals.regConfirmPassword}
+            onChange={(e) => {
+              handleChange('regConfirmPassword', e.target.value);
+            }}
+            onKeyDown={detectEnter}
             sx={{ width: 'calc(100% - 32px - 32px)' }}
           />
         </>
@@ -103,16 +183,28 @@ const LoginForm = ({ setOpen }: LoginFormProps) => {
           <IconBox>
             <PersonIcon />
           </IconBox>
-          <LoginInput placeholder='Username' />
+          <LoginInput
+            placeholder='Username'
+            value={formVals.loginUsername}
+            onChange={(e) => {
+              handleChange('loginUsername', e.target.value);
+            }}
+            onKeyDown={detectEnter}
+          />
           <IconBox>
             <KeyIcon />
           </IconBox>
-          <SubmitBtn>
+          <SubmitBtn onClick={handleSubmit}>
             <LoginIcon />
           </SubmitBtn>
           <LoginInput
             type='password'
             placeholder='Password'
+            value={formVals.loginPassword}
+            onChange={(e) => {
+              handleChange('loginPassword', e.target.value);
+            }}
+            onKeyDown={detectEnter}
             sx={{ width: 'calc(100% - 32px - 32px)' }}
           />
         </>
