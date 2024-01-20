@@ -12,6 +12,7 @@ interface AuthProviderProps {
 }
 
 export interface IUser {
+  _id: string;
   username: string;
 }
 
@@ -75,6 +76,7 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
         .then(async (res) => {
           if (!res.ok) {
             console.error('Failed to fetch authenticated user');
+            Cookies.remove('jwtCookie');
             return;
           }
           const { user } = await res.json();
@@ -82,6 +84,7 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
         })
         .catch((error) => {
           console.error('Error when fetching authenticated user: ', error);
+          Cookies.remove('jwtCookie');
         });
     }
   }, []);

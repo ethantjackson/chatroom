@@ -30,7 +30,6 @@ const MessageInput = () => {
     sendMessage({
       content: content,
       sender: user,
-      timestamp: new Date().toISOString(),
     });
     setContent('');
   };
