@@ -23,6 +23,7 @@ const SocketContext = createContext({
   socket: null as WebSocket | null,
   sendMessage: (message: IMessage) => {},
   messages: [] as IMessage[],
+  handleVote: (incValue: Number, messageId: string | undefined) => {},
 });
 
 export const SocketProvider = ({ children }: SocketContextProps) => {
@@ -58,6 +59,33 @@ export const SocketProvider = ({ children }: SocketContextProps) => {
     socket.send(JSON.stringify({ ...message, _id }));
   };
 
+  const handleVote = async (
+    incValue: Number,
+    messageId: string | undefined
+  ) => {
+    const jwtCookie = Cookies.get('jwtCookie');
+    if (!messageId || !jwtCookie) {
+      console.log('Vote failed');
+      return;
+    }
+    const res = await fetch('/message/vote', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: jwtCookie,
+      },
+      body: JSON.stringify({
+        messageId: messageId,
+        incValue: incValue,
+      }),
+    });
+    if (!res.ok) {
+      const { message } = await res.json();
+      console.log(message);
+      return;
+    }
+  };
+
   useEffect(() => {
     setSocket(new WebSocket('ws://localhost:8000'));
     fetch('/message/all-chat-messages').then(async (res) => {
@@ -89,7 +117,9 @@ export const SocketProvider = ({ children }: SocketContextProps) => {
   }, [socket]);
 
   return (
-    <SocketContext.Provider value={{ socket, sendMessage, messages }}>
+    <SocketContext.Provider
+      value={{ socket, sendMessage, messages, handleVote }}
+    >
       {children}
     </SocketContext.Provider>
   );

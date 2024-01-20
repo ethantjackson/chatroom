@@ -16,54 +16,66 @@ const MessageBubble = styled(Box)({
 
 const MessagesArea = () => {
   const { user } = useAuth();
-  const { messages } = useSocket();
+  const { messages, handleVote } = useSocket();
 
   return (
     <Box p={2} sx={{ height: '100%', overflow: 'auto' }}>
-      {messages.map(({ senderId, senderUsername, content, votes }, index) => (
-        <Box
-          key={senderId + index}
-          sx={{
-            display: 'flex',
-            justifyContent: senderId === user?._id ? 'right' : 'left',
-            alignItems: 'center',
-            color: (theme) => theme.palette.text.primary,
-          }}
-          mb={3}
-        >
+      {messages.map(
+        ({ senderId, senderUsername, content, votes, _id }, index) => (
           <Box
+            key={senderId + index}
             sx={{
-              display: 'inline-flex',
-              flexDirection: 'column',
-              justifyContent: 'center',
-              order: senderId === user?._id ? '0' : '1',
-              textAlign: 'center',
+              display: 'flex',
+              justifyContent: senderId === user?._id ? 'right' : 'left',
+              alignItems: 'center',
+              color: (theme) => theme.palette.text.primary,
             }}
-            p={1}
+            mb={3}
           >
-            <UpIcon sx={{ cursor: 'pointer' }} />
-            <Typography variant='body2'>{JSON.stringify(votes)}</Typography>
-            <DownIcon sx={{ cursor: 'pointer' }} />
-          </Box>
-          <MessageBubble
-            sx={{
-              backgroundColor: (theme) =>
-                senderId === user?._id
-                  ? theme.palette.primary.light
-                  : theme.palette.background.paper,
-            }}
-          >
-            <Typography
-              variant='body2'
-              color={senderId === user?._id ? 'secondary' : 'primary'}
-              sx={{ fontWeight: 'bold' }}
+            <Box
+              sx={{
+                display: 'inline-flex',
+                flexDirection: 'column',
+                justifyContent: 'center',
+                order: senderId === user?._id ? '0' : '1',
+                textAlign: 'center',
+              }}
+              p={1}
             >
-              {senderUsername}
-            </Typography>
-            <Typography>{content}</Typography>
-          </MessageBubble>
-        </Box>
-      ))}
+              <UpIcon
+                sx={{ cursor: 'pointer' }}
+                onClick={() => {
+                  handleVote(1, _id);
+                }}
+              />
+              <Typography variant='body2'>{JSON.stringify(votes)}</Typography>
+              <DownIcon
+                sx={{ cursor: 'pointer' }}
+                onClick={() => {
+                  handleVote(-1, _id);
+                }}
+              />
+            </Box>
+            <MessageBubble
+              sx={{
+                backgroundColor: (theme) =>
+                  senderId === user?._id
+                    ? theme.palette.primary.light
+                    : theme.palette.background.paper,
+              }}
+            >
+              <Typography
+                variant='body2'
+                color={senderId === user?._id ? 'secondary' : 'primary'}
+                sx={{ fontWeight: 'bold' }}
+              >
+                {senderUsername}
+              </Typography>
+              <Typography>{content}</Typography>
+            </MessageBubble>
+          </Box>
+        )
+      )}
     </Box>
   );
 };
