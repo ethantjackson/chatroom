@@ -2,35 +2,8 @@ import { Box, Typography, styled } from '@mui/material';
 import UpIcon from '@mui/icons-material/KeyboardArrowUp';
 import DownIcon from '@mui/icons-material/KeyboardArrowDown';
 import React from 'react';
-
-const mockMessages = [
-  {
-    username: 'chetbaker',
-    message:
-      'Lorem ipsum dolor sit amet consectetur adipisicing elit. Quidem quas, adipisci porro repellat recusandae nobis ab, laborum quo doloribus autem ullam numquam dolore ea, assumenda quisquam voluptatem. Veniam, ab dicta!',
-  },
-  {
-    username: 'milesdavis',
-    message: 'I play trumpet.',
-  },
-  {
-    username: 'clarkterry',
-    message:
-      'Lorem ipsum dolor sit amet consectetur, adipisicing elit. Iure corrupti deserunt labore vero aut culpa, ratione officia. Quos laboriosam consectetur porro dignissimos similique aperiam doloremque delectus! Voluptatum nobis beatae consequuntur. Lorem ipsum dolor sit amet consectetur adipisicing elit. Nemo rem cupiditate inventore eius molestias expedita. Est, fuga minima ab quo doloribus esse quia itaque ea exercitationem maxime, corrupti natus magni?',
-  },
-  {
-    username: 'chetbaker',
-    message:
-      'Lorem ipsum, dolor sit amet consectetur adipisicing elit. Aperiam, inventore. Eaque ut temporibus illum fugiat quos quaerat, id odio debitis maxime facere reiciendis quasi. Praesentium necessitatibus tempora dolorum aspernatur mollitia!',
-  },
-  {
-    username: 'kennydorham',
-    message:
-      'Lorem ipsum dolor sit amet consectetur adipisicing elit. Dolore accusamus aliquam deleniti sequi quam quis quo unde velit, cupiditate, eius aut rem eos, quisquam voluptate magni maxime? Explicabo, ab doloribus.',
-  },
-];
-
-const mockUsername = 'chetbaker';
+import { useSocket } from '../SocketContext';
+import { useAuth } from '../AuthContext';
 
 const MessageBubble = styled(Box)({
   textAlign: 'left',
@@ -42,14 +15,18 @@ const MessageBubble = styled(Box)({
 });
 
 const MessagesArea = () => {
+  const { user } = useAuth();
+  const { messages } = useSocket();
+
   return (
     <Box p={2} sx={{ height: '100%', overflow: 'auto' }}>
-      {mockMessages.map(({ username, message }, index) => (
+      {messages.map(({ sender, content }, index) => (
         <Box
-          key={username + index}
+          key={sender.username + index}
           sx={{
             display: 'flex',
-            justifyContent: username === mockUsername ? 'right' : 'left',
+            justifyContent:
+              sender.username === user?.username ? 'right' : 'left',
             alignItems: 'stretch',
             color: (theme) => theme.palette.text.primary,
           }}
@@ -60,7 +37,7 @@ const MessagesArea = () => {
               display: 'inline-flex',
               flexDirection: 'column',
               justifyContent: 'center',
-              order: username === mockUsername ? '0' : '1',
+              order: sender.username === user?.username ? '0' : '1',
               textAlign: 'center',
             }}
             p={1}
@@ -72,19 +49,21 @@ const MessagesArea = () => {
           <MessageBubble
             sx={{
               backgroundColor: (theme) =>
-                username === mockUsername
+                sender.username === user?.username
                   ? theme.palette.primary.light
                   : theme.palette.background.paper,
             }}
           >
             <Typography
               variant='body2'
-              color={username === mockUsername ? 'secondary' : 'primary'}
+              color={
+                sender.username === user?.username ? 'secondary' : 'primary'
+              }
               sx={{ fontWeight: 'bold' }}
             >
-              {username}
+              {sender.username}
             </Typography>
-            <Typography>{message}</Typography>
+            <Typography>{content}</Typography>
           </MessageBubble>
         </Box>
       ))}

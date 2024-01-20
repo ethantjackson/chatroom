@@ -20,13 +20,14 @@ interface SocketContextProps {
 const SocketContext = createContext({
   socket: null as WebSocket | null,
   sendMessage: (message: IMessage) => {},
+  messages: [] as IMessage[],
 });
 
 export const SocketProvider = ({ children }: SocketContextProps) => {
   const [socket, setSocket] = useState<WebSocket | null>(null);
+  const [messages, setMessages] = useState<IMessage[]>([]);
 
   const sendMessage = (message: IMessage) => {
-    console.log('sending message: ', message);
     if (message.content.trim() === '' || !socket) {
       return;
     }
@@ -47,7 +48,7 @@ export const SocketProvider = ({ children }: SocketContextProps) => {
 
     socket.onmessage = (event) => {
       const receivedMessage = JSON.parse(event.data);
-      console.log(receivedMessage);
+      setMessages((curMessages) => [...curMessages, receivedMessage]);
     };
 
     return () => {
@@ -56,7 +57,7 @@ export const SocketProvider = ({ children }: SocketContextProps) => {
   }, [socket]);
 
   return (
-    <SocketContext.Provider value={{ socket, sendMessage }}>
+    <SocketContext.Provider value={{ socket, sendMessage, messages }}>
       {children}
     </SocketContext.Provider>
   );
