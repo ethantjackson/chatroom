@@ -6,6 +6,8 @@ import { fileURLToPath } from 'url';
 import cors from 'cors';
 import bodyParser from 'body-parser';
 import userRouter from './routers/UserRouter.ts';
+import WebSocket, { WebSocketServer } from 'ws';
+import http from 'http';
 
 const app = express();
 const __filename = fileURLToPath(import.meta.url);
@@ -42,7 +44,27 @@ app.get('/health-check', (req, res) => {
 
 app.use('/user', userRouter);
 
+const server = http.createServer(app);
+const wss = new WebSocketServer({ server });
+
+wss.on('connection', (ws) => {
+  console.log('Client connected');
+
+  ws.on('message', (message) => {
+    wss.clients.forEach((client) => {
+      if (client.readyState === WebSocket.OPEN) {
+        const messageData = JSON.parse(message.toString());
+        client.send(JSON.stringify(messageData));
+      }
+    });
+  });
+
+  ws.on('close', () => {
+    console.log('closing connection');
+  });
+});
+
 const port = process.env.PORT || 8000;
-app.listen(port, () => {
+server.listen(port, () => {
   console.log(`Server started on port ${port}`);
 });

@@ -1,9 +1,9 @@
 import React, { useState } from 'react';
 import UserTab from '../UserTab/UserTab';
-import { Box, Grid, styled } from '@mui/material';
+import { Box, Grid, Typography, styled } from '@mui/material';
 import PersonIcon from '@mui/icons-material/Person';
-import SendIcon from '@mui/icons-material/Send';
-import MessagesArea from '../MessagesArea/MessagesArea';
+import MessagesArea from '../ChatArea/MessagesArea';
+import MessageInput from '../ChatArea/MessageInput';
 
 const UserTabBtn = styled(Box)(({ theme }) => ({
   height: '100%',
@@ -15,20 +15,6 @@ const UserTabBtn = styled(Box)(({ theme }) => ({
   backgroundColor: theme.palette.primary.main,
   color: theme.palette.primary.contrastText,
 }));
-
-const MessageInput = styled('input')({
-  position: 'relative',
-  top: '-7px',
-  paddingBlock: '0',
-  paddingInline: '0',
-  paddingLeft: '24px',
-  width: 'calc(100% - 24px - 64px)',
-  height: '64px',
-  border: '0',
-  '&:focus': {
-    outline: 'none',
-  },
-});
 
 const ChatRoom = () => {
   const [isUserTabOpen, setIsUserTabOpen] = useState(false);
@@ -51,7 +37,23 @@ const ChatRoom = () => {
             backgroundColor: (theme) => theme.palette.primary.light,
           }}
         >
-          <Box>test</Box>
+          <Box m={2}>
+            <Typography
+              variant='h3'
+              color='secondary'
+              sx={{ display: 'inline' }}
+            >
+              Chat
+            </Typography>
+            <Typography
+              variant='h3'
+              color='primary'
+              ml={1}
+              sx={{ display: 'inline' }}
+            >
+              App
+            </Typography>
+          </Box>
           {!isUserTabOpen && (
             <UserTabBtn
               onClick={() => {
@@ -70,24 +72,7 @@ const ChatRoom = () => {
         >
           <MessagesArea />
         </Box>
-        <MessageInput placeholder='Type your message here...' />
-        <Box
-          sx={{
-            height: '64px',
-            width: '64px',
-            display: 'inline-flex',
-            justifyContent: 'center',
-            alignItems: 'center',
-            backgroundColor: (theme) => theme.palette.background.paper,
-          }}
-        >
-          <SendIcon
-            sx={{
-              color: (theme) => theme.palette.secondary.main,
-              cursor: 'pointer',
-            }}
-          />
-        </Box>
+        <MessageInput />
       </Grid>
       {isUserTabOpen && (
         <Grid item xs={3}>

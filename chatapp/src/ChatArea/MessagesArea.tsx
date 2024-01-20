@@ -43,7 +43,7 @@ const MessageBubble = styled(Box)({
 
 const MessagesArea = () => {
   return (
-    <Box p={2}>
+    <Box p={2} sx={{ height: '100%', overflow: 'auto' }}>
       {mockMessages.map(({ username, message }, index) => (
         <Box
           key={username + index}
