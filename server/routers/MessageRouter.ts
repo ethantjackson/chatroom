@@ -47,12 +47,13 @@ messageRouter.post(
     try {
       const session = await startSession();
       let transactionSuccessful = true;
+      let updatedChat = null;
       session.startTransaction();
-
       try {
-        await ChatMessage.updateOne(
+        updatedChat = await ChatMessage.findOneAndUpdate(
           { _id: messageId },
-          { $inc: { votes: incValue } }
+          { $inc: { votes: incValue } },
+          { new: true }
         ).session(session);
         if (isUnvote) {
           await User.updateOne(
@@ -88,7 +89,7 @@ messageRouter.post(
         if (!transactionSuccessful) {
           res.status(500).json({ message: 'Vote was unsuccessful' });
         } else {
-          res.status(200).json({ message: 'Vote processed successfully' });
+          res.status(200).json({ updatedChat: updatedChat });
         }
       }
     } catch (err) {

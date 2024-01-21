@@ -63,7 +63,17 @@ const MessagesArea = () => {
                     }
                 }}
               />
-              <Typography variant='body2'>{JSON.stringify(votes)}</Typography>
+              <Typography
+                variant='body2'
+                color={
+                  user?.downvotedChatIds.has(_id || '-1') ||
+                  user?.upvotedChatIds.has(_id || '-1')
+                    ? 'secondary'
+                    : 'textPrimary'
+                }
+              >
+                {JSON.stringify(votes)}
+              </Typography>
               <DownIcon
                 sx={{
                   cursor: 'pointer',

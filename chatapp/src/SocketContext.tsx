@@ -114,6 +114,13 @@ export const SocketProvider = ({ children }: SocketContextProps) => {
       updatedUser?.downvotedChatIds.add(messageId);
     }
     setUser({ ...(updatedUser as IUser) });
+    const { updatedChat } = await res.json();
+    console.log(updatedChat);
+    setMessages([
+      ...messages.map((message) =>
+        message._id === updatedChat._id ? updatedChat : message
+      ),
+    ]);
   };
 
   useEffect(() => {
