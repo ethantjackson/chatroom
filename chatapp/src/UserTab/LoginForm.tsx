@@ -4,6 +4,7 @@ import KeyIcon from '@mui/icons-material/Key';
 import LoginIcon from '@mui/icons-material/Login';
 import React, { useEffect, useRef, useState, KeyboardEvent } from 'react';
 import { useAuth } from '../AuthContext';
+import { useError } from '../ErrorContext';
 
 const FormContainer = styled(Box)(({ theme }) => ({
   width: 'calc(100% - 24px)',
@@ -58,6 +59,7 @@ interface LoginFormProps {
 }
 
 const LoginForm = ({ setOpen }: LoginFormProps) => {
+  const { showError } = useError();
   const [isCreateAccount, setIsCreateAccount] = useState(false);
   const [formVals, setFormVals] = useState({
     regUsername: '',
@@ -100,23 +102,19 @@ const LoginForm = ({ setOpen }: LoginFormProps) => {
         formVals.loginUsername,
         formVals.loginPassword
       );
-      if (!success) {
-        console.log(message || 'Login failed');
-      } else {
+      if (success) {
         setOpen(false);
       }
       return;
     }
 
     if (formVals.regPassword !== formVals.regConfirmPassword) {
-      console.log('mismatched passwords');
+      showError('Passwords do not match');
       return;
     }
     try {
       const res = await fetch(
-        `${
-          process.env.REACT_APP_WEBSERVER_URL || 'http://127.0.0.1:52176'
-        }/user/register`,
+        `${process.env.REACT_APP_WEBSERVER_URL || ''}/user/register`,
         {
           method: 'POST',
           headers: {
@@ -129,13 +127,13 @@ const LoginForm = ({ setOpen }: LoginFormProps) => {
         }
       );
       if (!res.ok) {
-        console.log('Could not register');
+        showError('Account creation failed. Please try again later');
         return;
       }
-      console.log('Account created successfully');
       setIsCreateAccount(false);
     } catch (error) {
-      console.log(error);
+      console.error(error);
+      showError('Account creation failed. Please try again later');
     }
   };
 

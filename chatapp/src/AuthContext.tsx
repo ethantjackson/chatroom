@@ -6,6 +6,8 @@ import React, {
   useEffect,
   useState,
 } from 'react';
+import httpProxy from 'http-proxy';
+import { useError } from './ErrorContext';
 
 interface AuthProviderProps {
   children: ReactNode;
@@ -32,6 +34,7 @@ const AuthContext = createContext({
 });
 
 export const AuthProvider = ({ children }: AuthProviderProps) => {
+  const { showError } = useError();
   const [user, setUser] = useState<IUser | null>(null);
 
   const login = async (
@@ -40,9 +43,7 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
   ): Promise<ILoginRes> => {
     try {
       const res = await fetch(
-        `${
-          process.env.REACT_APP_WEBSERVER_URL || 'http://127.0.0.1:52176'
-        }/user/login`,
+        `${process.env.REACT_APP_WEBSERVER_URL || ''}/user/login`,
         {
           method: 'POST',
           headers: {
@@ -56,6 +57,7 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
       );
       if (!res.ok) {
         const { message } = await res.json();
+        showError(message);
         return { success: false, message: message };
       }
       const { token, user } = await res.json();
@@ -68,6 +70,7 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
       return { success: true };
     } catch (error) {
       console.error(error);
+      showError('Could not log in. Please try again later');
       return { success: false };
     }
   };
@@ -82,7 +85,7 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
     if (jwtCookie) {
       fetch(
         `${
-          process.env.REACT_APP_WEBSERVER_URL || 'http://127.0.0.1:52176'
+          process.env.REACT_APP_WEBSERVER_URL || ''
         }/user/get-authenticated-user`,
         {
           headers: {

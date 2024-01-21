@@ -17,14 +17,7 @@ const dotenvConfig = dotenv.config({ path: `${__dirname}/.env` });
 
 app.use(express.json());
 app.use(bodyParser.json());
-app.use(
-  cors()
-  // cors({
-  //   credentials: true,
-  //   allowedHeaders: ['Content-Type', 'Authorization'],
-  //   origin: [process.env.CLIENT_URL || 'https://localhost:3000'],
-  // })
-);
+app.use(cors());
 
 const mongo_uri = process.env.MONGO_URI || '';
 mongoose
@@ -58,10 +51,6 @@ wss.on('connection', (ws) => {
         client.send(JSON.stringify(messageData));
       }
     });
-  });
-
-  ws.on('close', () => {
-    console.log('closing connection');
   });
 });
 

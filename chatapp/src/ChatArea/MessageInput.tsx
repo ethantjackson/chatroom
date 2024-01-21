@@ -28,6 +28,7 @@ const MessageInput = () => {
       return;
     }
     sendChatMessage({
+      type: 'CHAT',
       content: content,
       senderId: user._id,
       senderUsername: user.username,

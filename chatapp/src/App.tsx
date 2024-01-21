@@ -1,9 +1,11 @@
 import React from 'react';
-import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
 import { createTheme } from '@mui/material';
 import { ThemeOptions } from '@mui/material/styles';
 import { ThemeProvider } from '@emotion/react';
 import ChatRoom from './ChatRoom/ChatRoom';
+import { ErrorProvider } from './ErrorContext';
+import { AuthProvider } from './AuthContext';
+import { SocketProvider } from './SocketContext';
 
 export const themeOptions: ThemeOptions = {
   palette: {
@@ -38,11 +40,13 @@ const theme = createTheme(themeOptions);
 function App() {
   return (
     <ThemeProvider theme={theme}>
-      <Router>
-        <Routes>
-          <Route path='/' element={<ChatRoom />} />
-        </Routes>
-      </Router>
+      <ErrorProvider>
+        <AuthProvider>
+          <SocketProvider>
+            <ChatRoom />
+          </SocketProvider>
+        </AuthProvider>
+      </ErrorProvider>
     </ThemeProvider>
   );
 }

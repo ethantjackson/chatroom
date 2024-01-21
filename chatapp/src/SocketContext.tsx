@@ -7,8 +7,12 @@ import React, {
 } from 'react';
 import Cookies from 'js-cookie';
 import { IUser, useAuth } from './AuthContext';
+import { useError } from './ErrorContext';
+
+type MessageType = 'CHAT' | 'VOTE';
 
 interface IChat {
+  type: MessageType;
   content: string;
   senderId: string;
   senderUsername: string;
@@ -17,13 +21,9 @@ interface IChat {
 }
 
 interface IVote {
+  type: MessageType;
   incVal: number;
   messageId: string;
-}
-
-interface IMessage {
-  type: 'CHAT' | 'VOTE';
-  value: IChat | IVote;
 }
 
 interface SocketContextProps {
@@ -43,13 +43,14 @@ const SocketContext = createContext({
 
 export const SocketProvider = ({ children }: SocketContextProps) => {
   const { user, setUser } = useAuth();
+  const { showError } = useError();
   const [socket, setSocket] = useState<WebSocket | null>(null);
   const [chats, setChats] = useState<IChat[]>([]);
 
   const sendChatMessage = async (message: IChat) => {
     const jwtCookie = Cookies.get('jwtCookie');
     if (!jwtCookie) {
-      console.log('Please sign in again');
+      showError('Please login to send messages');
       return;
     }
     if (message.content.trim() === '' || !socket) {
@@ -57,7 +58,7 @@ export const SocketProvider = ({ children }: SocketContextProps) => {
     }
     const res = await fetch(
       `${
-        process.env.REACT_APP_WEBSERVER_URL || 'http://127.0.0.1:52176'
+        process.env.REACT_APP_WEBSERVER_URL || ''
       }/message/create-chat-message`,
       {
         method: 'POST',
@@ -73,7 +74,8 @@ export const SocketProvider = ({ children }: SocketContextProps) => {
     );
     if (!res.ok) {
       const { message } = await res.json();
-      console.log(message);
+      console.error(message);
+      showError('Message could not be sent. Please try again later');
       return;
     }
     const { _id } = await res.json();
@@ -87,13 +89,11 @@ export const SocketProvider = ({ children }: SocketContextProps) => {
   ) => {
     const jwtCookie = Cookies.get('jwtCookie');
     if (!messageId || !jwtCookie || !socket) {
-      console.log('Vote failed');
+      showError('Could not process vote at this time. Please try again later');
       return;
     }
     const res = await fetch(
-      `${
-        process.env.REACT_APP_WEBSERVER_URL || 'http://127.0.0.1:52176'
-      }/message/vote`,
+      `${process.env.REACT_APP_WEBSERVER_URL || ''}/message/vote`,
       {
         method: 'POST',
         headers: {
@@ -109,7 +109,8 @@ export const SocketProvider = ({ children }: SocketContextProps) => {
     );
     if (!res.ok) {
       const { message } = await res.json();
-      console.log(message);
+      console.error(message);
+      showError('Could not process votes at this time. Please try again later');
       return;
     }
     const updatedUser = user;
@@ -132,22 +133,15 @@ export const SocketProvider = ({ children }: SocketContextProps) => {
   useEffect(() => {
     setSocket(
       new WebSocket(
-        `ws://${
-          process.env.REACT_APP_WEBSERVER_URL?.slice(
-            process.env.REACT_APP_WEBSERVER_URL.indexOf('http://') +
-              'http://'.length
-          ) || '127.0.0.1:52176'
-        }`
+        `ws://${process.env.REACT_APP_WEBSERVER_IP}:${process.env.REACT_APP_WEBSERVER_PORT}`
       )
     );
     fetch(
-      `${
-        process.env.REACT_APP_WEBSERVER_URL || 'http://127.0.0.1:52176'
-      }/message/all-chat-messages`
+      `${process.env.REACT_APP_WEBSERVER_URL || ''}/message/all-chat-messages`
     ).then(async (res) => {
       const data = await res.json();
       if (!res.ok) {
-        console.log(data.message);
+        console.error(data.message);
         return;
       }
       setChats([...data.messages]);
@@ -158,19 +152,15 @@ export const SocketProvider = ({ children }: SocketContextProps) => {
     if (!socket) {
       return;
     }
-    socket.onopen = () => {
-      console.log('Websocket connection established');
-    };
 
     socket.onmessage = (event) => {
       const receivedMessage = JSON.parse(event.data);
       switch (receivedMessage.type) {
         case 'CHAT':
-          setChats((curChats) => [...curChats, receivedMessage]);
+          setChats((curChats) => [...curChats, receivedMessage as IChat]);
           break;
         case 'VOTE':
-          const { incVal, messageId } = receivedMessage;
-          console.log('PROCESS vote', incVal, messageId);
+          const { incVal, messageId } = receivedMessage as IVote;
           setChats((chats) =>
             chats.map((chat) =>
               chat._id === messageId
