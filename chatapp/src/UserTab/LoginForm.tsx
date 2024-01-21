@@ -114,7 +114,7 @@ const LoginForm = ({ setOpen }: LoginFormProps) => {
     }
     try {
       const res = await fetch(
-        `${process.env.REACT_APP_WEBSERVER_URL || ''}/user/register`,
+        `http://${process.env.REACT_APP_WEBSERVER_IP}:${process.env.REACT_APP_WEBSERVER_PORT}/user/register`,
         {
           method: 'POST',
           headers: {

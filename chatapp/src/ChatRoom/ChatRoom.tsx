@@ -16,8 +16,15 @@ const UserTabBtn = styled(Box)(({ theme }) => ({
   color: theme.palette.primary.contrastText,
 }));
 
+const TitleBox = styled(Box)(({ theme }) => ({
+  display: 'flex',
+  justifyContent: 'space-between',
+  height: '82px',
+  backgroundColor: theme.palette.primary.light,
+}));
+
 const ChatRoom = () => {
-  const [isUserTabOpen, setIsUserTabOpen] = useState(true);
+  const [isUserTabOpen, setIsUserTabOpen] = useState(false);
 
   return (
     <Grid
@@ -29,14 +36,7 @@ const ChatRoom = () => {
       }}
     >
       <Grid item xs={isUserTabOpen ? 9 : 12}>
-        <Box
-          sx={{
-            display: 'flex',
-            justifyContent: 'space-between',
-            height: '82px',
-            backgroundColor: (theme) => theme.palette.primary.light,
-          }}
-        >
+        <TitleBox>
           <Box m={2}>
             <Typography
               variant='h3'
@@ -63,7 +63,7 @@ const ChatRoom = () => {
               <PersonIcon />
             </UserTabBtn>
           )}
-        </Box>
+        </TitleBox>
         <Box
           sx={{
             height: 'calc(100vh - 82px - 64px)',
@@ -75,7 +75,15 @@ const ChatRoom = () => {
         <MessageInput />
       </Grid>
       {isUserTabOpen && (
-        <Grid item xs={3}>
+        <Grid
+          item
+          xs={12}
+          sm={3}
+          sx={{
+            position: { xs: 'absolute', sm: 'static' },
+            width: { xs: '100vw', sm: 'auto' },
+          }}
+        >
           <UserTab isOpen={isUserTabOpen} setIsOpen={setIsUserTabOpen} />
         </Grid>
       )}

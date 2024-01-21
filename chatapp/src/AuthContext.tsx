@@ -6,7 +6,6 @@ import React, {
   useEffect,
   useState,
 } from 'react';
-import httpProxy from 'http-proxy';
 import { useError } from './ErrorContext';
 
 interface AuthProviderProps {
@@ -43,7 +42,7 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
   ): Promise<ILoginRes> => {
     try {
       const res = await fetch(
-        `${process.env.REACT_APP_WEBSERVER_URL || ''}/user/login`,
+        `http://${process.env.REACT_APP_WEBSERVER_IP}:${process.env.REACT_APP_WEBSERVER_PORT}/user/login`,
         {
           method: 'POST',
           headers: {
@@ -84,9 +83,7 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
     const jwtCookie = Cookies.get('jwtCookie');
     if (jwtCookie) {
       fetch(
-        `${
-          process.env.REACT_APP_WEBSERVER_URL || ''
-        }/user/get-authenticated-user`,
+        `http://${process.env.REACT_APP_WEBSERVER_IP}:${process.env.REACT_APP_WEBSERVER_PORT}/user/get-authenticated-user`,
         {
           headers: {
             Authorization: jwtCookie,

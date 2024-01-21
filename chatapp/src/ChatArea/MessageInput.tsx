@@ -18,6 +18,14 @@ const Input = styled('input')({
   },
 });
 
+const InputBox = styled(Box)({
+  height: '64px',
+  width: '64px',
+  display: 'inline-flex',
+  justifyContent: 'center',
+  alignItems: 'center',
+});
+
 const MessageInput = () => {
   const { user } = useAuth();
   const { sendChatMessage } = useSocket();
@@ -71,13 +79,8 @@ const MessageInput = () => {
           },
         }}
       />
-      <Box
+      <InputBox
         sx={{
-          height: '64px',
-          width: '64px',
-          display: 'inline-flex',
-          justifyContent: 'center',
-          alignItems: 'center',
           backgroundColor: (theme) =>
             user == null
               ? theme.palette.background.default
@@ -92,7 +95,7 @@ const MessageInput = () => {
           }}
           onClick={handleSend}
         />
-      </Box>
+      </InputBox>
     </>
   );
 };

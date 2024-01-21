@@ -57,9 +57,7 @@ export const SocketProvider = ({ children }: SocketContextProps) => {
       return;
     }
     const res = await fetch(
-      `${
-        process.env.REACT_APP_WEBSERVER_URL || ''
-      }/message/create-chat-message`,
+      `http://${process.env.REACT_APP_WEBSERVER_IP}:${process.env.REACT_APP_WEBSERVER_PORT}/message/create-chat-message`,
       {
         method: 'POST',
         headers: {
@@ -93,7 +91,7 @@ export const SocketProvider = ({ children }: SocketContextProps) => {
       return;
     }
     const res = await fetch(
-      `${process.env.REACT_APP_WEBSERVER_URL || ''}/message/vote`,
+      `http://${process.env.REACT_APP_WEBSERVER_IP}:${process.env.REACT_APP_WEBSERVER_PORT}/message/vote`,
       {
         method: 'POST',
         headers: {
@@ -137,7 +135,7 @@ export const SocketProvider = ({ children }: SocketContextProps) => {
       )
     );
     fetch(
-      `${process.env.REACT_APP_WEBSERVER_URL || ''}/message/all-chat-messages`
+      `http://${process.env.REACT_APP_WEBSERVER_IP}:${process.env.REACT_APP_WEBSERVER_PORT}/message/all-chat-messages`
     ).then(async (res) => {
       const data = await res.json();
       if (!res.ok) {

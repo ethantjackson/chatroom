@@ -11,10 +11,19 @@ const UserBox = styled(Box)(({ theme }) => ({
   borderRadius: '32px',
 }));
 
+const UserIcon = styled(CircleIcon)(({ theme }) => ({
+  fontSize: '12px',
+  marginLeft: '4px',
+  position: 'relative',
+  top: '1.5px',
+}));
+
 const UsersList = () => {
   const [users, setUsers] = useState<IUser[]>([]);
   useEffect(() => {
-    fetch(`${process.env.REACT_APP_WEBSERVER_URL || ''}/user/all-users`)
+    fetch(
+      `http://${process.env.REACT_APP_WEBSERVER_IP}:${process.env.REACT_APP_WEBSERVER_PORT}/user/all-users`
+    )
       .then(async (res) => {
         const data = await res.json();
         if (!res.ok) {
@@ -35,14 +44,7 @@ const UsersList = () => {
           <UserBox mb={1}>
             <Typography variant='body2'>
               {user.username}
-              <CircleIcon
-                sx={{
-                  fontSize: '12px',
-                  marginLeft: '4px',
-                  position: 'relative',
-                  top: '1.5px',
-                }}
-              />
+              <UserIcon />
             </Typography>
           </UserBox>
         </Box>

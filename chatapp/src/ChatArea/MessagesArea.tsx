@@ -1,25 +1,42 @@
 import { Box, Typography, styled } from '@mui/material';
 import UpIcon from '@mui/icons-material/KeyboardArrowUp';
 import DownIcon from '@mui/icons-material/KeyboardArrowDown';
-import React from 'react';
+import React, { useEffect, useRef } from 'react';
 import { useSocket } from '../SocketContext';
 import { useAuth } from '../AuthContext';
 
-const MessageBubble = styled(Box)({
+const MessageBubble = styled(Box)(({ theme }) => ({
   textAlign: 'left',
   display: 'inline-block',
-  maxWidth: '60%',
   borderRadius: '24px',
   padding: '12px 22px',
   boxShadow: '0px 0px 5px rgba(0,0,0,0.1)',
+  [theme.breakpoints.up('sm')]: {
+    maxWidth: '60%',
+  },
+}));
+
+const VotesContainer = styled(Box)({
+  display: 'inline-flex',
+  flexDirection: 'column',
+  justifyContent: 'center',
+  textAlign: 'center',
 });
 
 const MessagesArea = () => {
   const { user } = useAuth();
   const { chats, handleVote } = useSocket();
+  const chatContainerRef = useRef<HTMLDivElement | null>(null);
+
+  useEffect(() => {
+    if (chatContainerRef.current) {
+      chatContainerRef.current.scrollTop =
+        chatContainerRef.current.scrollHeight;
+    }
+  }, [chats]);
 
   return (
-    <Box p={2} sx={{ height: '100%', overflow: 'auto' }}>
+    <Box ref={chatContainerRef} p={2} sx={{ height: '100%', overflow: 'auto' }}>
       {chats.map(({ senderId, senderUsername, content, votes, _id }, index) => (
         <Box
           key={senderId + index}
@@ -31,13 +48,9 @@ const MessagesArea = () => {
           }}
           mb={3}
         >
-          <Box
+          <VotesContainer
             sx={{
-              display: 'inline-flex',
-              flexDirection: 'column',
-              justifyContent: 'center',
               order: senderId === user?._id ? '0' : '1',
-              textAlign: 'center',
             }}
             p={1}
           >
@@ -95,7 +108,7 @@ const MessagesArea = () => {
                 }
               }}
             />
-          </Box>
+          </VotesContainer>
           <MessageBubble
             sx={{
               backgroundColor: (theme) =>
