@@ -113,16 +113,21 @@ const LoginForm = ({ setOpen }: LoginFormProps) => {
       return;
     }
     try {
-      const res = await fetch('/user/register', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          username: formVals.regUsername,
-          password: formVals.regPassword,
-        }),
-      });
+      const res = await fetch(
+        `${
+          process.env.REACT_APP_WEBSERVER_URL || 'http://127.0.0.1:52176'
+        }/user/register`,
+        {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            username: formVals.regUsername,
+            password: formVals.regPassword,
+          }),
+        }
+      );
       if (!res.ok) {
         console.log('Could not register');
         return;

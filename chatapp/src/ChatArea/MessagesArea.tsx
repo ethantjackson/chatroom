@@ -43,16 +43,47 @@ const MessagesArea = () => {
               p={1}
             >
               <UpIcon
-                sx={{ cursor: 'pointer' }}
+                sx={{
+                  cursor: 'pointer',
+                  color: (theme) =>
+                    _id && user?.upvotedChatIds.has(_id || '-1')
+                      ? theme.palette.secondary.main
+                      : 'inherit',
+                }}
                 onClick={() => {
-                  handleVote(1, _id);
+                  if (_id && user)
+                    if (user.upvotedChatIds.has(_id)) {
+                      handleVote(-1, true, _id);
+                    } else {
+                      handleVote(
+                        user.downvotedChatIds.has(_id) ? 2 : 1,
+                        false,
+                        _id
+                      );
+                    }
                 }}
               />
               <Typography variant='body2'>{JSON.stringify(votes)}</Typography>
               <DownIcon
-                sx={{ cursor: 'pointer' }}
+                sx={{
+                  cursor: 'pointer',
+                  color: (theme) =>
+                    _id && user?.downvotedChatIds.has(_id || '-1')
+                      ? theme.palette.secondary.main
+                      : 'inherit',
+                }}
                 onClick={() => {
-                  handleVote(-1, _id);
+                  if (_id && user) {
+                    if (user.downvotedChatIds.has(_id)) {
+                      handleVote(1, true, _id);
+                    } else {
+                      handleVote(
+                        user.upvotedChatIds.has(_id) ? -2 : -1,
+                        false,
+                        _id
+                      );
+                    }
+                  }
                 }}
               />
             </Box>

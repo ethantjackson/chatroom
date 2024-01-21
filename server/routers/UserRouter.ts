@@ -2,11 +2,11 @@ import { NextFunction, Request, Response, Router } from 'express';
 import jwt from 'jsonwebtoken';
 import User from '../schemas/UserSchema.ts';
 
-interface AuthenticatedRequest extends Request {
+export interface AuthenticatedRequest extends Request {
   userId?: string;
 }
 
-const authenticateToken = (
+export const authenticateToken = (
   req: AuthenticatedRequest,
   res: Response,
   next: NextFunction

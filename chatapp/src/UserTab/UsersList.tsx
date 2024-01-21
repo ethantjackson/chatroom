@@ -14,7 +14,11 @@ const UserBox = styled(Box)(({ theme }) => ({
 const UsersList = () => {
   const [users, setUsers] = useState<IUser[]>([]);
   useEffect(() => {
-    fetch('/user/all-users')
+    fetch(
+      `${
+        process.env.REACT_APP_WEBSERVER_URL || 'http://127.0.0.1:52176'
+      }/user/all-users`
+    )
       .then(async (res) => {
         const data = await res.json();
         if (!res.ok) {

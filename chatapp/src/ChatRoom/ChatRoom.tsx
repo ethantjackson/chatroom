@@ -17,7 +17,7 @@ const UserTabBtn = styled(Box)(({ theme }) => ({
 }));
 
 const ChatRoom = () => {
-  const [isUserTabOpen, setIsUserTabOpen] = useState(false);
+  const [isUserTabOpen, setIsUserTabOpen] = useState(true);
 
   return (
     <Grid

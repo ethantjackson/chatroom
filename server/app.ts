@@ -8,6 +8,7 @@ import bodyParser from 'body-parser';
 import userRouter from './routers/UserRouter.ts';
 import WebSocket, { WebSocketServer } from 'ws';
 import http from 'http';
+import messageRouter from './routers/MessageRouter.ts';
 
 const app = express();
 const __filename = fileURLToPath(import.meta.url);
@@ -39,10 +40,12 @@ mongoose
   });
 
 app.get('/health-check', (req, res) => {
-  res.status(200).send('OK');
+  console.log('Server recieved health check');
+  res.status(200).send('Healthy');
 });
 
 app.use('/user', userRouter);
+app.use('/message', messageRouter);
 
 const server = http.createServer(app);
 const wss = new WebSocketServer({ server });
@@ -64,5 +67,5 @@ wss.on('connection', (ws) => {
 
 const port = process.env.PORT || 8000;
 server.listen(port, () => {
-  console.log(`Server started on port ${port}`);
+  console.log(`Server started on port: ${port}`);
 });

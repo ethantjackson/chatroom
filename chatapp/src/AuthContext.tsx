@@ -14,6 +14,8 @@ interface AuthProviderProps {
 export interface IUser {
   _id: string;
   username: string;
+  upvotedChatIds: Set<string>;
+  downvotedChatIds: Set<string>;
 }
 
 export interface ILoginRes {
@@ -23,6 +25,7 @@ export interface ILoginRes {
 
 const AuthContext = createContext({
   user: null as IUser | null,
+  setUser: (user: IUser | null) => {},
   login: (username: string, password: string): Promise<ILoginRes> =>
     Promise.resolve({ success: false }),
   logout: () => {},
@@ -36,23 +39,32 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
     password: string
   ): Promise<ILoginRes> => {
     try {
-      const res = await fetch('/user/login', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          username: username,
-          password: password,
-        }),
-      });
+      const res = await fetch(
+        `${
+          process.env.REACT_APP_WEBSERVER_URL || 'http://127.0.0.1:52176'
+        }/user/login`,
+        {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            username: username,
+            password: password,
+          }),
+        }
+      );
       if (!res.ok) {
         const { message } = await res.json();
         return { success: false, message: message };
       }
       const { token, user } = await res.json();
       Cookies.set('jwtCookie', token, { expires: 7 });
-      setUser({ ...user });
+      setUser({
+        ...user,
+        upvotedChatIds: new Set(user.upvotedChatIds),
+        downvotedChatIds: new Set(user.downvotedChatIds),
+      });
       return { success: true };
     } catch (error) {
       console.error(error);
@@ -68,18 +80,27 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
   useEffect(() => {
     const jwtCookie = Cookies.get('jwtCookie');
     if (jwtCookie) {
-      fetch('/user/get-authenticated-user', {
-        headers: {
-          Authorization: jwtCookie,
-        },
-      })
+      fetch(
+        `${
+          process.env.REACT_APP_WEBSERVER_URL || 'http://127.0.0.1:52176'
+        }/user/get-authenticated-user`,
+        {
+          headers: {
+            Authorization: jwtCookie,
+          },
+        }
+      )
         .then(async (res) => {
           if (!res.ok) {
             console.error('Failed to fetch authenticated user');
             return;
           }
           const { user } = await res.json();
-          setUser({ ...user });
+          setUser({
+            ...user,
+            upvotedChatIds: new Set(user.upvotedChatIds),
+            downvotedChatIds: new Set(user.downvotedChatIds),
+          });
         })
         .catch((error) => {
           console.error('Error when fetching authenticated user: ', error);
@@ -88,7 +109,7 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
   }, []);
 
   return (
-    <AuthContext.Provider value={{ user, login, logout }}>
+    <AuthContext.Provider value={{ user, setUser, login, logout }}>
       {children}
     </AuthContext.Provider>
   );

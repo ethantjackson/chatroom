@@ -8,6 +8,8 @@ export interface IUser extends Document {
     pass: string,
     next: (err: Error | null, same: boolean | null) => void
   ) => void;
+  upvotedChatIds: Schema.Types.ObjectId[];
+  downvotedChatIds: Schema.Types.ObjectId[];
 }
 
 const UserSchema = new Schema<IUser>({
@@ -21,6 +23,14 @@ const UserSchema = new Schema<IUser>({
     type: String,
     trim: true,
     require: true,
+  },
+  upvotedChatIds: {
+    type: [{ type: Schema.Types.ObjectId, ref: 'ChatMessage' }],
+    default: [],
+  },
+  downvotedChatIds: {
+    type: [{ type: Schema.Types.ObjectId, ref: 'ChatMessage' }],
+    default: [],
   },
 });
 
