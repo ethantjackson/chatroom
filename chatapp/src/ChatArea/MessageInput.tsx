@@ -20,14 +20,14 @@ const Input = styled('input')({
 
 const MessageInput = () => {
   const { user } = useAuth();
-  const { sendMessage } = useSocket();
+  const { sendChatMessage } = useSocket();
   const [content, setContent] = useState('');
 
   const handleSend = () => {
     if (!user) {
       return;
     }
-    sendMessage({
+    sendChatMessage({
       content: content,
       senderId: user._id,
       senderUsername: user.username,

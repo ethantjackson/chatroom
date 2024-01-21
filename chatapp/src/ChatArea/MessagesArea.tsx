@@ -16,107 +16,105 @@ const MessageBubble = styled(Box)({
 
 const MessagesArea = () => {
   const { user } = useAuth();
-  const { messages, handleVote } = useSocket();
+  const { chats, handleVote } = useSocket();
 
   return (
     <Box p={2} sx={{ height: '100%', overflow: 'auto' }}>
-      {messages.map(
-        ({ senderId, senderUsername, content, votes, _id }, index) => (
+      {chats.map(({ senderId, senderUsername, content, votes, _id }, index) => (
+        <Box
+          key={senderId + index}
+          sx={{
+            display: 'flex',
+            justifyContent: senderId === user?._id ? 'right' : 'left',
+            alignItems: 'center',
+            color: (theme) => theme.palette.text.primary,
+          }}
+          mb={3}
+        >
           <Box
-            key={senderId + index}
             sx={{
-              display: 'flex',
-              justifyContent: senderId === user?._id ? 'right' : 'left',
-              alignItems: 'center',
-              color: (theme) => theme.palette.text.primary,
+              display: 'inline-flex',
+              flexDirection: 'column',
+              justifyContent: 'center',
+              order: senderId === user?._id ? '0' : '1',
+              textAlign: 'center',
             }}
-            mb={3}
+            p={1}
           >
-            <Box
+            <UpIcon
               sx={{
-                display: 'inline-flex',
-                flexDirection: 'column',
-                justifyContent: 'center',
-                order: senderId === user?._id ? '0' : '1',
-                textAlign: 'center',
+                cursor: 'pointer',
+                color: (theme) =>
+                  _id && user?.upvotedChatIds.has(_id || '-1')
+                    ? theme.palette.secondary.main
+                    : 'inherit',
               }}
-              p={1}
-            >
-              <UpIcon
-                sx={{
-                  cursor: 'pointer',
-                  color: (theme) =>
-                    _id && user?.upvotedChatIds.has(_id || '-1')
-                      ? theme.palette.secondary.main
-                      : 'inherit',
-                }}
-                onClick={() => {
-                  if (_id && user)
-                    if (user.upvotedChatIds.has(_id)) {
-                      handleVote(-1, true, _id);
-                    } else {
-                      handleVote(
-                        user.downvotedChatIds.has(_id) ? 2 : 1,
-                        false,
-                        _id
-                      );
-                    }
-                }}
-              />
-              <Typography
-                variant='body2'
-                color={
-                  user?.downvotedChatIds.has(_id || '-1') ||
-                  user?.upvotedChatIds.has(_id || '-1')
-                    ? 'secondary'
-                    : 'textPrimary'
-                }
-              >
-                {JSON.stringify(votes)}
-              </Typography>
-              <DownIcon
-                sx={{
-                  cursor: 'pointer',
-                  color: (theme) =>
-                    _id && user?.downvotedChatIds.has(_id || '-1')
-                      ? theme.palette.secondary.main
-                      : 'inherit',
-                }}
-                onClick={() => {
-                  if (_id && user) {
-                    if (user.downvotedChatIds.has(_id)) {
-                      handleVote(1, true, _id);
-                    } else {
-                      handleVote(
-                        user.upvotedChatIds.has(_id) ? -2 : -1,
-                        false,
-                        _id
-                      );
-                    }
+              onClick={() => {
+                if (_id && user)
+                  if (user.upvotedChatIds.has(_id)) {
+                    handleVote(-1, true, _id);
+                  } else {
+                    handleVote(
+                      user.downvotedChatIds.has(_id) ? 2 : 1,
+                      false,
+                      _id
+                    );
                   }
-                }}
-              />
-            </Box>
-            <MessageBubble
-              sx={{
-                backgroundColor: (theme) =>
-                  senderId === user?._id
-                    ? theme.palette.primary.light
-                    : theme.palette.background.paper,
               }}
+            />
+            <Typography
+              variant='body2'
+              color={
+                user?.downvotedChatIds.has(_id || '-1') ||
+                user?.upvotedChatIds.has(_id || '-1')
+                  ? 'secondary'
+                  : 'textPrimary'
+              }
             >
-              <Typography
-                variant='body2'
-                color={senderId === user?._id ? 'secondary' : 'primary'}
-                sx={{ fontWeight: 'bold' }}
-              >
-                {senderUsername}
-              </Typography>
-              <Typography>{content}</Typography>
-            </MessageBubble>
+              {JSON.stringify(votes)}
+            </Typography>
+            <DownIcon
+              sx={{
+                cursor: 'pointer',
+                color: (theme) =>
+                  _id && user?.downvotedChatIds.has(_id || '-1')
+                    ? theme.palette.secondary.main
+                    : 'inherit',
+              }}
+              onClick={() => {
+                if (_id && user) {
+                  if (user.downvotedChatIds.has(_id)) {
+                    handleVote(1, true, _id);
+                  } else {
+                    handleVote(
+                      user.upvotedChatIds.has(_id) ? -2 : -1,
+                      false,
+                      _id
+                    );
+                  }
+                }
+              }}
+            />
           </Box>
-        )
-      )}
+          <MessageBubble
+            sx={{
+              backgroundColor: (theme) =>
+                senderId === user?._id
+                  ? theme.palette.primary.light
+                  : theme.palette.background.paper,
+            }}
+          >
+            <Typography
+              variant='body2'
+              color={senderId === user?._id ? 'secondary' : 'primary'}
+              sx={{ fontWeight: 'bold' }}
+            >
+              {senderUsername}
+            </Typography>
+            <Typography>{content}</Typography>
+          </MessageBubble>
+        </Box>
+      ))}
     </Box>
   );
 };

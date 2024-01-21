@@ -8,12 +8,22 @@ import React, {
 import Cookies from 'js-cookie';
 import { IUser, useAuth } from './AuthContext';
 
-export interface IMessage {
+interface IChat {
   content: string;
   senderId: string;
   senderUsername: string;
   votes: number;
   _id?: string;
+}
+
+interface IVote {
+  incVal: number;
+  messageId: string;
+}
+
+interface IMessage {
+  type: 'CHAT' | 'VOTE';
+  value: IChat | IVote;
 }
 
 interface SocketContextProps {
@@ -22,8 +32,8 @@ interface SocketContextProps {
 
 const SocketContext = createContext({
   socket: null as WebSocket | null,
-  sendMessage: (message: IMessage) => {},
-  messages: [] as IMessage[],
+  sendChatMessage: (message: IChat) => {},
+  chats: [] as IChat[],
   handleVote: (
     incValue: number,
     isUnvote: boolean,
@@ -34,9 +44,9 @@ const SocketContext = createContext({
 export const SocketProvider = ({ children }: SocketContextProps) => {
   const { user, setUser } = useAuth();
   const [socket, setSocket] = useState<WebSocket | null>(null);
-  const [messages, setMessages] = useState<IMessage[]>([]);
+  const [chats, setChats] = useState<IChat[]>([]);
 
-  const sendMessage = async (message: IMessage) => {
+  const sendChatMessage = async (message: IChat) => {
     const jwtCookie = Cookies.get('jwtCookie');
     if (!jwtCookie) {
       console.log('Please sign in again');
@@ -67,7 +77,7 @@ export const SocketProvider = ({ children }: SocketContextProps) => {
       return;
     }
     const { _id } = await res.json();
-    socket.send(JSON.stringify({ ...message, _id }));
+    socket.send(JSON.stringify({ ...message, _id, type: 'CHAT' }));
   };
 
   const handleVote = async (
@@ -76,7 +86,7 @@ export const SocketProvider = ({ children }: SocketContextProps) => {
     messageId: string | undefined
   ) => {
     const jwtCookie = Cookies.get('jwtCookie');
-    if (!messageId || !jwtCookie) {
+    if (!messageId || !jwtCookie || !socket) {
       console.log('Vote failed');
       return;
     }
@@ -114,13 +124,9 @@ export const SocketProvider = ({ children }: SocketContextProps) => {
       updatedUser?.downvotedChatIds.add(messageId);
     }
     setUser({ ...(updatedUser as IUser) });
-    const { updatedChat } = await res.json();
-    console.log(updatedChat);
-    setMessages([
-      ...messages.map((message) =>
-        message._id === updatedChat._id ? updatedChat : message
-      ),
-    ]);
+    socket.send(
+      JSON.stringify({ incVal: incValue, messageId: messageId, type: 'VOTE' })
+    );
   };
 
   useEffect(() => {
@@ -144,7 +150,7 @@ export const SocketProvider = ({ children }: SocketContextProps) => {
         console.log(data.message);
         return;
       }
-      setMessages([...data.messages]);
+      setChats([...data.messages]);
     });
   }, []);
 
@@ -158,7 +164,22 @@ export const SocketProvider = ({ children }: SocketContextProps) => {
 
     socket.onmessage = (event) => {
       const receivedMessage = JSON.parse(event.data);
-      setMessages((curMessages) => [...curMessages, receivedMessage]);
+      switch (receivedMessage.type) {
+        case 'CHAT':
+          setChats((curChats) => [...curChats, receivedMessage]);
+          break;
+        case 'VOTE':
+          const { incVal, messageId } = receivedMessage;
+          console.log('PROCESS vote', incVal, messageId);
+          setChats((chats) =>
+            chats.map((chat) =>
+              chat._id === messageId
+                ? { ...chat, votes: chat.votes + incVal }
+                : chat
+            )
+          );
+          break;
+      }
     };
 
     return () => {
@@ -168,7 +189,7 @@ export const SocketProvider = ({ children }: SocketContextProps) => {
 
   return (
     <SocketContext.Provider
-      value={{ socket, sendMessage, messages, handleVote }}
+      value={{ socket, sendChatMessage, chats, handleVote }}
     >
       {children}
     </SocketContext.Provider>
